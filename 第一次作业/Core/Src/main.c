@@ -95,13 +95,9 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
     /* USER CODE BEGIN 3 */
 		
-		
-		/*//////////////////////////////////////////////////////////////////////////////////////*/
-		
-		
+		/*//////////////////////////////////////////////////////////////////////////////////////*/	
 		/*This is board LED blinking*/
 		HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
 		/*This is the bread board one*/
@@ -116,8 +112,6 @@ int main(void)
 		HAL_Delay(250);
 		HAL_GPIO_WritePin(LED_BOARD_GPIO_Port, LED_BOARD_Pin, GPIO_PIN_RESET);
 		/*That's how 500ms a circle*/
-		
-		
 		/*/////////////////////////////////////////////////////////////////////////////////////*/
  
 
