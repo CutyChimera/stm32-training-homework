@@ -97,12 +97,31 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-		HAL_GPIO_TogglePin(LED_BOARD_GPIO_Port, LED_BOARD_Pin);
+		
+		
+		/*//////////////////////////////////////////////////////////////////////////////////////*/
+		
+		
+		/*This is board LED blinking*/
 		HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
-		HAL_Delay(500);
+		/*This is the bread board one*/
+		HAL_Delay(250);
+		HAL_GPIO_WritePin(LED_BOARD_GPIO_Port, LED_BOARD_Pin, GPIO_PIN_SET);
+		
+		
+		/*flip the condition of PC13*/
+		
+		
 		HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
-		HAL_Delay(500);
-  }
+		HAL_Delay(250);
+		HAL_GPIO_WritePin(LED_BOARD_GPIO_Port, LED_BOARD_Pin, GPIO_PIN_RESET);
+		/*That's how 500ms a circle*/
+		
+		
+		/*/////////////////////////////////////////////////////////////////////////////////////*/
+ 
+
+	}
   /* USER CODE END 3 */
 }
 
