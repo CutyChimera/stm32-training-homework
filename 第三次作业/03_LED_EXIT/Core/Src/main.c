@@ -207,8 +207,6 @@ static void MX_GPIO_Init(void)
 		PA5 is the bread board LED
 		PC13 is the board LED
 	*/
-
-
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	if (GPIO_Pin == GPIO_PIN_1)
