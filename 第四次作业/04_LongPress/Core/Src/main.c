@@ -60,24 +60,32 @@ GPIO_PinState debouncing(void)
 {
 	static GPIO_PinState stable = GPIO_PIN_SET;
 	static uint32_t POVstart = 0;
+	/*POV is the name I learned from WarThunder, here it stands for deviate*/
 	static uint8_t POVcontinue = 0;
 	GPIO_PinState raw = 0;
 	uint32_t now = 0;
 	raw = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_1);
+	/*It's where new state written in*/
 	now = HAL_GetTick();
 	if (raw != stable)
+	/*The button was pressed, or just a disturbance*/
 	{
 		if (POVcontinue == 0)
 		{
 			POVstart = HAL_GetTick();
+			/*Record the deviation starting time*/
 			POVcontinue = 1;
+			/*continuing state recognized*/
 		}
+		/*The new state will be used only if it had deviated from 
+																							the origin state for 20ms*/
 		if (now - POVstart >= 20)
 		{
 			stable = raw;
 			POVcontinue = 0;
 		}
 	}
+	/*If not, just ignore it and reset the continuing state*/
 	else
 	{
 		POVcontinue = 0;	
@@ -178,9 +186,11 @@ int main(void)
 	static uint8_t mode = 0;
 	static uint32_t last_blink=0;
 	static GPIO_PinState level = GPIO_PIN_SET;
+	/*Initialize the level of button*/
 	static uint32_t press_start = 0;
 	now = HAL_GetTick();
 	level = debouncing();
+	/*A function written by myself, located in line 59*/
 	static GPIO_PinState prev_level = GPIO_PIN_SET;
 	if (level != prev_level)
 	{
@@ -189,9 +199,10 @@ int main(void)
 		else
 		{
 			uint32_t duration = now - press_start;
-			if (duration >=1000)
+			if (duration >= 1000)
 			{
 				mode = !mode;
+				/*flip the mode*/
 				last_blink = now;
 			}
 			else
@@ -203,7 +214,8 @@ int main(void)
 				}
 				/*else
 					{
-					
+						I planned to write another 2 situations. 
+						It just turned out I did't have enough time
 					}*/
 				}
 			}
