@@ -55,6 +55,46 @@ static void MX_GPIO_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+
+GPIO_PinState debouncing(void)
+{
+	static GPIO_PinState stable = GPIO_PIN_SET;
+	static uint32_t POVstart = 0;
+	/*POV is the name I learned from WarThunder, here it stands for deviate*/
+	static uint8_t POVcontinue = 0;
+	GPIO_PinState raw = 0;
+	uint32_t now = 0;
+	raw = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_1);
+	/*It's where new state written in*/
+	now = HAL_GetTick();
+	if (raw != stable)
+	/*The button was pressed, or just a disturbance*/
+	{
+		if (POVcontinue == 0)
+		{
+			POVstart = HAL_GetTick();
+			/*Record the deviation starting time*/
+			POVcontinue = 1;
+			/*continuing state recognized*/
+		}
+		/*The new state will be used only if it had deviated from 
+																							the origin state for 20ms*/
+		if (now - POVstart >= 20)
+		{
+			stable = raw;
+			POVcontinue = 0;
+		}
+	}
+	/*If not, just ignore it and reset the continuing state*/
+	else
+	{
+		POVcontinue = 0;	
+	}
+	return stable;
+}
+/*OKay, I'll confess it. It is the function I pasted from last task.*/
+
+
 /* USER CODE END 0 */
 
 /**
@@ -95,9 +135,66 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
+		
     /* USER CODE BEGIN 3 */
-  }
+		
+		
+		static uint32_t now = 0;
+		now = HAL_GetTick();
+		static uint8_t state = 0;
+		/*'state' is the variable that contains the sum of current button state*/
+		static uint32_t first_release = 0;
+		/*First release time*/
+		static GPIO_PinState level = GPIO_PIN_SET;
+		static GPIO_PinState prevlevel = GPIO_PIN_SET;
+		/*A Useless Initialization*/
+		level = debouncing();
+		if (prevlevel != level)
+		{
+			/*Check whether the button was pressed*/
+			if (level == GPIO_PIN_RESET)
+			{
+				if (state == 1)
+				/*Only if the button is pressed twice the state could
+				equals to 1 while level came to RESET again*/
+				{
+					HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+					HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+					state = 2;
+				}
+				else
+				{
+					/*The button has already been pressed twice, so state was reinitalized*/
+					if (state == 2)
+						state = 0;
+					else/*if state equals to zero, it means first press button*/
+					{
+						/*Emmm, bad sequences?*/
+						first_release = now;
+						state = 1;
+					}
+				}
+			}
+			else
+			{
+				if (state == 2)
+					state = 0;
+				else
+				{
+					first_release = HAL_GetTick();
+					state = 1;
+				}
+			}
+			prevlevel = level;
+		}
+		/*Timeout, and the state was reinitialized*/
+		if (state == 1 && (now - first_release >500))
+			state = 0;
+  }		
+	/*AI said I've written some lines of dead code which is affecting nothing,
+		but I decided to let them stay for I'm afraid of making this whole thing incorrect.*/
+	
+	
   /* USER CODE END 3 */
 }
 
